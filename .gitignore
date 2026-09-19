@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Scoring runs — keep the log, drop per-run submission folders
+scores/*/
+!scores/log.csv
