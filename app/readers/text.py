@@ -196,3 +196,39 @@ def find_si_bl(email):
             bl_doc = doc
 
     return si_doc, bl_doc
+
+def check_filename_mismatch(filename, doc_type):
+    """
+    Check whether the filename's _SI / _BL hint
+    matches the actual detected document type.
+
+    Returns:
+        None - no mismatch
+        dict - mismatch information
+    """
+    filename_upper = str(filename).upper()
+
+    filename_hint = None
+
+    if "_SI" in filename_upper:
+        filename_hint = "SI"
+    elif "_BL" in filename_upper:
+        filename_hint = "BL"
+
+    # No SI/BL hint in filename
+    if filename_hint is None:
+        return None
+
+    # Filename and actual document type match
+    if filename_hint == doc_type:
+        return None
+
+    return {
+        "filename": str(filename),
+        "filename_type": filename_hint,
+        "actual_type": doc_type,
+        "message": (
+            f"Filename suggests {filename_hint}, "
+            f"but actual document type is {doc_type}."
+        ),
+    }
