@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python: secrets, environments, caches, local databases
+.env
+.venv/
+__pycache__/
+*.pyc
+*.db
+backup-app-*/
+
+# Scoring runs (keep scores/log.csv)
+scores/*/
