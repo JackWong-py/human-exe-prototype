@@ -23,6 +23,16 @@ dist-ssr
 *.sln
 *.sw?
 
+<<<<<<< HEAD
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Scoring runs — keep the log, drop per-run submission folders
+scores/*/
+!scores/log.csv
+=======
 # Python: secrets, environments, caches, local databases
 .env
 .venv/
@@ -32,3 +42,4 @@ __pycache__/
 
 # Scoring runs (keep scores/log.csv)
 scores/*/
+>>>>>>> db16662c206ae14ae84853881eb4ce94aeb344f3
