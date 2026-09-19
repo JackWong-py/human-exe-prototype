@@ -3,7 +3,7 @@ from pathlib import Path
 
 from docx import Document
 
-
+# Store the information extracted from a DOCX document.
 @dataclass
 class RawDoc:
     doc_type: str
@@ -17,6 +17,7 @@ def detect_doc_type(title: str) -> str:
     """
     Detect document type from the document title.
     """
+    # Convert the title to uppercase so the comparison works regardless of uppercase or lowercase letters.
     title_upper = str(title).upper()
 
     if "INSTRUCTION" in title_upper:
@@ -40,9 +41,14 @@ def clean_text(text: str) -> str:
     Clean text from a DOCX paragraph or table cell.
     Multiple lines are joined into one value.
     """
+
+    # Store the cleaned lines here.
     lines = []
 
+    # Split the text into separate lines.
     for line in str(text).splitlines():
+
+        # Remove spaces before and after each line.
         line = line.strip()
 
         if line:
@@ -65,6 +71,7 @@ def read_docx(path: str | Path) -> RawDoc:
     try:
         document = Document(path)
     except Exception:
+        # If the document cannot be opened, return an unreadable document.
         return RawDoc(
             doc_type="OTHER",
             title="",
@@ -122,9 +129,11 @@ def read_docx(path: str | Path) -> RawDoc:
             if len(cells) < 2:
                 continue
 
+            # Clean the label and value from the cells.
             label = clean_text(cells[0].text)
             value = clean_text(cells[1].text)
 
+            # Skip rows where either the label or value is empty.
             if not label or not value:
                 continue
 
