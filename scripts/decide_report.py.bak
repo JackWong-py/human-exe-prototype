@@ -24,7 +24,7 @@ from app.mapping import extract_fields  # noqa: E402
 
 
 def fixture_pairs():
-    with open(os.path.join(ROOT, "fixtures", "rawdocs.json"), encoding="utf-8") as fh:
+    with open(os.path.join(ROOT, "fixtures", "rawdocs.json")) as fh:
         raw = json.load(fh)
     doc = lambda d: RawDoc(**d) if d else None            # noqa: E731
     return {eid: (doc(p["si"]), doc(p["bl"])) for eid, p in raw.items()}

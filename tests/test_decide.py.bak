@@ -48,7 +48,7 @@ MISSING = {"email_516": ["gross_weight_kg"], "email_517": ["port_of_loading", "p
 
 
 def load():
-    with open(FIXTURES, encoding="utf-8") as fh:
+    with open(FIXTURES) as fh:
         raw = json.load(fh)
     doc = lambda d: RawDoc(**d) if d else None          # noqa: E731
     return {eid: (doc(p["si"]), doc(p["bl"])) for eid, p in raw.items()}

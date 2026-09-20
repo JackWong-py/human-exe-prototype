@@ -23,7 +23,7 @@ from app.readers import common, pdf, scan
 TEXT_PDFS = ["email_059", "email_160", "email_208", "email_273", "email_313",
              "email_351", "email_407", "email_411", "email_434", "email_499"]
 SCANS = ["email_512", "email_513", "email_514"]
-HAS_TESSERACT = shutil.which("tesseract") is not None or os.path.exists(os.environ.get("TESSERACT_CMD", ""))
+HAS_TESSERACT = shutil.which("tesseract") is not None
 
 
 def read(eid, kind, fn=pdf.read_pdf):
@@ -130,7 +130,7 @@ class TextPdfTests(unittest.TestCase):
                 return f"{n} {c}".strip()
             return norm_count(v) if field == "container_count" else norm_weight(v)
 
-        with open("fixtures/rawdocs.json", encoding="utf-8") as fh:
+        with open("fixtures/rawdocs.json") as fh:
             fixtures = json.load(fh)
         for eid, pair in fixtures.items():
             for kind in ("si", "bl"):
