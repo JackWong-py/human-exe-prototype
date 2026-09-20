@@ -83,7 +83,7 @@ class PipelineTests(unittest.TestCase):
         rv = next(r for r in db.list_reviews("OPEN") if r["email_id"] == "email_507")  # BL missing
         with self.assertRaises(ValueError):           # no BL values -> still missing
             pipeline.resolve_review(rv["id"], si_values={"shipper": "X"})
-        row = pipeline.resolve_review(rv["id"], bl_values=ALL_FIELDS)
+        row = pipeline.resolve_review(rv["id"], si_values=ALL_FIELDS, bl_values=ALL_FIELDS)
         self.assertEqual(row["status"], "OK")
         self.assertIn("reviewer input", row["message"])
 

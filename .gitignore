@@ -39,6 +39,7 @@ scores/*/
 __pycache__/
 *.pyc
 *.db
+backup-app-*/
 
 # Scoring runs (keep scores/log.csv)
 scores/*/
