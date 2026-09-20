@@ -1,14 +1,13 @@
-<<<<<<< HEAD
 """
-app/inbox.py — one place that decides where emails come from.
+app/inbox.py: one place that decides where emails come from.
 
-Source is read from the INBOX_SOURCE env var so folder-vs-server is a single
-switch for both the classifier smoke test and scripts/score.py:
+The source is read from the INBOX_SOURCE environment variable, so "local folder" versus
+"organizers' server" is a single switch for the API, the tests and scripts/score.py:
 
-    export INBOX_SOURCE=/path/to/sdoc-hackathon-bundle   # local folder
-    export INBOX_SOURCE=http://localhost:8080            # organizers' server
+    export INBOX_SOURCE=/path/to/sdoc-hackathon-bundle   # a local folder
+    export INBOX_SOURCE=http://localhost:8080            # the organizers' server
 
-Defaults to the repo's bundled ./data folder when unset.
+Without it, the repo's own data/ folder is used (an absolute path, so it works from any directory).
 """
 from __future__ import annotations
 
@@ -18,27 +17,17 @@ from pathlib import Path
 from loader import Inbox
 
 _DEFAULT = str(Path(__file__).resolve().parents[1] / "data")
+_cache: dict[str, Inbox] = {}
 
 
 def get_inbox(source: str | None = None) -> Inbox:
-    """Return an Inbox for the given source, INBOX_SOURCE, or the bundled data."""
-    return Inbox(source or os.environ.get("INBOX_SOURCE") or _DEFAULT)
-=======
-"""One place that decides where emails come from (folder or HTTP server)."""
-import os
-from loader import Inbox
-
-_inbox = None
+    """Return the Inbox for `source`, else INBOX_SOURCE, else the bundled data folder."""
+    src = source or os.environ.get("INBOX_SOURCE") or _DEFAULT
+    if src not in _cache:
+        _cache[src] = Inbox(src)
+    return _cache[src]
 
 
-def get_inbox():
-    global _inbox
-    if _inbox is None:
-        _inbox = Inbox(os.environ.get("INBOX_SOURCE", "data"))
-    return _inbox
-
-
-def reset_inbox():
-    global _inbox
-    _inbox = None
->>>>>>> db16662c206ae14ae84853881eb4ce94aeb344f3
+def reset_inbox() -> None:
+    """Forget cached inboxes (only needed if you want a completely fresh Inbox object)."""
+    _cache.clear()
