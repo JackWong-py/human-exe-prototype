@@ -118,13 +118,14 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.c.get("/api/reviews/1").json()["state"], "RESOLVED")
 
     def test_submit_is_guarded(self):
-        self.assertEqual(self.c.post("/api/submission/submit").status_code, 409)   # nothing run
+        self.assertEqual(self.c.post("/api/submission/submit").status_code, 409)   # nothing run yet
         self.c.post("/api/run")
-        r = self.c.post("/api/submission/submit")
-        self.assertEqual(r.status_code, 409)                                        # stubs active
-        self.assertIn("Stub modules", " ".join(r.json()["problems"]))
-        r = self.c.post("/api/submission/submit", params={"force": "true"})
-        self.assertEqual(r.status_code, 400)                                        # folder source
+        with mock.patch.object(readers, "IS_STUB", True, create=True):             # pretend a stub is still active
+            r = self.c.post("/api/submission/submit")
+            self.assertEqual(r.status_code, 409)
+            self.assertIn("Stub modules", " ".join(r.json()["problems"]))
+        r = self.c.post("/api/submission/submit")     # no stubs: only the folder source stops it now
+        self.assertEqual(r.status_code, 400)
         self.assertEqual(len(self.c.get("/api/submission").json()), len(get_inbox().emails()))
 
     def test_cors_allows_the_vite_dev_server(self):

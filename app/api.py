@@ -4,6 +4,8 @@ Run from the repo root:   uvicorn app.api:app --reload --port 8000
 Interactive API docs:     http://localhost:8000/docs
 """
 import html
+import os
+from contextlib import asynccontextmanager
 from typing import Any, Optional
 
 from fastapi import FastAPI, Query
@@ -21,10 +23,18 @@ from . import db, decide as dec, pipeline, readers, submission
 from .contracts import FIELDS
 from .inbox import get_inbox
 
-app = FastAPI(title="human.exe backend")
+@asynccontextmanager
+async def lifespan(_app):
+    """With AUTO_RUN=1 the first start processes every email, so a fresh deployment is not empty."""
+    if os.environ.get("AUTO_RUN", "").lower() in ("1", "true", "yes") and db.summary()["total"] == 0:
+        pipeline.run_all()
+    yield
+
+
+app = FastAPI(title="human.exe backend", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],   # the Vite dev server
+    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
     allow_methods=["*"], allow_headers=["*"],
 )
 

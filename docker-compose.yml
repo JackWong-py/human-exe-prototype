@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Where the emails come from. The default is the copy of the data folder inside the image.
+      # To use the organizers' server on your machine instead:
+      #   INBOX_SOURCE=http://host.docker.internal:8080 docker compose up
+      INBOX_SOURCE: ${INBOX_SOURCE:-/srv/data}
+      DB_PATH: /db/sdoc.db
+      AUTO_RUN: ${AUTO_RUN:-1}
+      SCAN_VISION: ${SCAN_VISION:-off}
+      # Optional (Gemini fallback for scans). Compose reads these from your shell or from .env.
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      # Address of a separately hosted frontend, if you build one.
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    # lets the container reach the organizers' server on Linux
+    volumes:
+      - dbdata:/db                             # keeps results and reviews between restarts
+    restart: unless-stopped
+
+volumes:
+  dbdata:

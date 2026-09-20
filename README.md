@@ -1,16 +1,44 @@
-# React + Vite
+# human.exe: shipping document verification
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Reads an inbox of shipping emails, sorts each one into a category and, for the "please check
+this draft BL against the SI" requests, compares the two documents on 7 fields (shipper,
+consignee, notify party, port of loading, port of discharge, container count, gross weight).
+Anything it cannot decide goes to a person, with the evidence, and the report updates when the
+person answers.
 
-Currently, two official plugins are available:
+## Run it
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+With Docker (the first start processes all 520 emails, so the report is filled):
 
-## React Compiler
+    docker compose up --build
+    open http://localhost:8000/report
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Without Docker:
 
-## Expanding the Oxlint configuration
+    python3 -m venv .venv && source .venv/bin/activate
+    pip install -r requirements.txt
+    sudo apt install tesseract-ocr          # reads the scanned PDFs
+    uvicorn app.api:app --port 8000
+    curl -X POST localhost:8000/api/run     # process every email
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Pages: `/report`, `/reviews-ui` (the human review queue), `/docs` (the API).
+
+## Where the emails come from
+
+`INBOX_SOURCE` decides. By default it is the `data/` folder (a copy of the organizers' bundle).
+Set `INBOX_SOURCE=http://localhost:8080` to read from the organizers' server instead. Only the
+server can score a submission: `POST /api/submission/submit`.
+
+## How it works
+
+1. `app/classify.py` sorts each email (BL_COMPARISON, SI_REQUEST, INVOICE_QUERY, GENERAL, SPAM).
+2. For BL_COMPARISON emails `app/readers/` reads the SI and BL (txt, xlsx, docx, PDF, scanned PDF).
+3. `app/mapping.py`, `app/normalize.py` and `app/decide.py` compare them: OK, MISMATCH, or
+   NEEDS_REVIEW (missing attachment, wrong document, unreadable, missing value).
+4. `app/pipeline.py` and `app/db.py` store every result, open a review for each NEEDS_REVIEW,
+   record failures visibly and allow retries. `app/api.py` serves it all.
+
+## Check that everything fits together
+
+    python -m unittest discover -s tests
+    python scripts/check_contracts.py       # 14 checks, and the totals for the whole inbox

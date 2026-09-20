@@ -118,7 +118,7 @@ def read_txt(path: str | Path) -> RawDoc:
         # Only save the pair if a label was found.
         if current_label is not None:
             # Combine multiple continuation lines into one value.
-            value = " ".join(current_value).strip()
+            value = " | ".join(v for v in current_value if v).strip()   # " | " between lines: line 1 is the name
 
             # Combine the source lines into one source snippet.
             source = " ".join(current_source).strip()

@@ -54,7 +54,7 @@ def clean_text(text: str) -> str:
         if line:
             lines.append(line)
 
-    return " ".join(lines).strip()
+    return " | ".join(lines).strip()   # " | " between lines: line 1 is the name, the rest the address
 
 
 def read_docx(path: str | Path) -> RawDoc:
