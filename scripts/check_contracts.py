@@ -232,4 +232,4 @@ if __name__ == "__main__":
         print(f"{status:4s} [{who:5s}] {name:{width}s}  {note}")
     counts = {s: sum(1 for r in results if r[0] == s) for s in ("PASS", "FAIL", "SKIP")}
     print(f"\n{counts['PASS']} passed, {counts['FAIL']} failed, {counts['SKIP']} skipped")
-    sys.exit(1 if counts["FAIL"] else 0
+    sys.exit(1 if counts["FAIL"] else 0)

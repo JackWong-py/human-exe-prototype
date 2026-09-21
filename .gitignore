@@ -23,13 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 
-# Python: secrets, environments, caches, local databases
+# Python: secrets, environments, caches, local databases, backup files
 .env
 .venv/
 __pycache__/
 *.pyc
 *.db
 backup-app-*/
+*.bak
 
 # Scoring runs: keep the log, drop the per-run submission folders
 scores/*/
