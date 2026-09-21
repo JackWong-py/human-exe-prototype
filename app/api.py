@@ -22,6 +22,7 @@ except ImportError:                   # pragma: no cover
 from . import db, decide as dec, pipeline, readers, submission
 from .contracts import FIELDS
 from .inbox import get_inbox
+from .suggest_api import router as suggest_router   # Task 4: drafted replies
 
 @asynccontextmanager
 async def lifespan(_app):
@@ -37,6 +38,8 @@ app.add_middleware(
     allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
     allow_methods=["*"], allow_headers=["*"],
 )
+
+app.include_router(suggest_router)
 
 STATUS_ORDER = {"NEEDS_REVIEW": 0, "MISMATCH": 1, "OK": 2}
 
@@ -226,6 +229,8 @@ def report():
             link = (f" <a href='/reviews-ui/{review_of[r['email_id']]}'>review</a>"
                     if r["email_id"] in review_of else "")
             detail = f"{_e(r['review_reason'])} &mdash; {_e(r['message'])}{link}"
+        if r["status"] in ("MISMATCH", "NEEDS_REVIEW"):
+            detail += f" &nbsp;<a href='/draft/{_e(r['email_id'])}'>draft reply</a>"
         human = " <small>(human)</small>" if r["resolved_by_human"] else ""
         out.append(f"<tr><td>{_e(r['email_id'])}{human}</td>"
                    f"<td><span class='tag {_e(r['status'])}'>{_e(r['status'])}</span></td><td>{detail}</td></tr>")
@@ -288,6 +293,7 @@ def review_ui(review_id: int):
     out = [f"<h1>Review #{rv['id']} &mdash; {_e(rv['email_id'])}</h1>"
            f"<p>Reason: <span class='tag NEEDS_REVIEW'>{_e(rv['reason'])}</span> &nbsp; State: {_e(rv['state'])}"
            f" &nbsp; Subject: {_e(res.get('subject'))}</p>",
+           f"<p><a href='/draft/{_e(rv['email_id'])}'>Draft a reply to the sender</a></p>",
            _doc_html(ev.get("si"), "SI (reference)"), _doc_html(ev.get("bl"), "Draft BL")]
     if rv["state"] == "OPEN":
         rows = "".join(f"<tr><td>{f}</td><td><input type='text' id='si_{f}'></td>"

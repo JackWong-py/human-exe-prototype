@@ -83,7 +83,7 @@ def get_processed_emails():
             
             # 5. Send both documents and the prompt to the working model
             response = client.models.generate_content(
-                model='gemini-1.5-flash-8b', 
+                model='gemini-3.5-flash', 
                 contents=[
                     prompt, 
                     "\n--- SI DOCUMENT ---\n", si_content, 
