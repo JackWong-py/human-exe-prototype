@@ -39,3 +39,8 @@ body {
 .shadow-soft {
   box-shadow: 0 14px 34px -16px rgba(242, 107, 33, 0.35), 0 2px 6px rgba(63, 67, 80, 0.06);
 }
+
+/* Phones: never let anything push the page wider than the screen */
+body {
+  overflow-x: hidden;
+}

@@ -40,10 +40,10 @@ export function DashboardView({ summary, checks, error, running, message, onRun,
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr] [&>*]:min-w-0">
         {/* Big number + chart (the "TURNOVER" card in the design) */}
         <Card className="border-transparent shadow-soft">
-          <CardContent className="px-7">
+          <CardContent className="px-4 sm:px-7">
             <div className="flex items-start justify-between">
               <div className="text-xs font-semibold tracking-widest text-muted-foreground">DOCUMENT CHECKS</div>
               <button onClick={() => onNavigate("checks")} className="text-xs text-muted-foreground hover:text-primary">
@@ -91,7 +91,7 @@ export function DashboardView({ summary, checks, error, running, message, onRun,
                 <TableRow>
                   <TableHead>Email</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>What needs attention</TableHead>
+                  <TableHead className="hidden sm:table-cell">What needs attention</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -99,7 +99,7 @@ export function DashboardView({ summary, checks, error, running, message, onRun,
                   <TableRow key={row.email_id} className={index === 0 ? "border-l-4 border-l-primary bg-white shadow-md" : ""}>
                     <TableCell className="text-xs font-semibold">{row.email_id}</TableCell>
                     <TableCell><StatusBadge status={row.status} /></TableCell>
-                    <TableCell className="max-w-44 truncate text-xs text-muted-foreground">{describe(row)}</TableCell>
+                    <TableCell className="hidden max-w-44 truncate text-xs text-muted-foreground sm:table-cell">{describe(row)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -116,7 +116,7 @@ export function DashboardView({ summary, checks, error, running, message, onRun,
       </div>
 
       {/* Bottom banner (the "Create your CRM profile" banner in the design) */}
-      <div className="bg-brand-gradient flex flex-wrap items-center gap-5 rounded-2xl px-8 py-7 text-white shadow-soft">
+      <div className="bg-brand-gradient flex flex-wrap items-center gap-4 rounded-2xl px-5 py-5 text-white shadow-soft sm:gap-5 sm:px-8 sm:py-7">
         <div className="grid size-16 shrink-0 place-items-center rounded-full bg-white text-primary">
           <Play className="size-7" />
         </div>

@@ -43,9 +43,9 @@ export function ChecksView({ checks, error, filter, onFilter, query, onQuery, on
       </div>
 
       <Card className="border-transparent shadow-soft">
-        <CardContent className="space-y-4 px-6">
+        <CardContent className="space-y-4 px-3 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Tabs value={filter} onValueChange={onFilter}>
+            <Tabs value={filter} onValueChange={onFilter} className="max-w-full overflow-x-auto">
               <TabsList>
                 {FILTERS.map(([value, label]) => (
                   <TabsTrigger key={value} value={value}>
@@ -54,7 +54,7 @@ export function ChecksView({ checks, error, filter, onFilter, query, onQuery, on
                 ))}
               </TabsList>
             </Tabs>
-            <Input value={query} onChange={(e) => onQuery(e.target.value)} placeholder="Search email number or subject" className="max-w-xs" />
+            <Input value={query} onChange={(e) => onQuery(e.target.value)} placeholder="Search email number or subject" className="w-full sm:max-w-xs" />
           </div>
 
           <Table>

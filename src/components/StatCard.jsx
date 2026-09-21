@@ -8,14 +8,14 @@ export default function StatCard({ icon: Icon, value, label, hint, highlight = f
     <Card
       onClick={onClick}
       className={
-        "relative flex-row items-center gap-5 px-6 py-6 shadow-soft " +
+        "relative flex-row items-center gap-3 px-4 py-4 shadow-soft sm:gap-5 sm:px-6 sm:py-6 " +
         (highlight ? "border-2 border-primary " : "border-transparent ") +
         (onClick ? "cursor-pointer transition hover:-translate-y-0.5" : "")
       }
     >
       {highlight && <Bookmark className="absolute -top-1 right-5 size-7 fill-primary text-primary" />}
-      <div className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-primary/50 bg-secondary text-primary">
-        <Icon className="size-7" />
+      <div className="grid size-12 shrink-0 place-items-center sm:size-16 rounded-full border-2 border-primary/50 bg-secondary text-primary">
+        <Icon className="size-6 sm:size-7" />
       </div>
       <div className="h-12 w-px bg-border" />
       <div>
