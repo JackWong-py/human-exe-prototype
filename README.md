@@ -2,7 +2,7 @@
 
 > Find the document requests. Compare the shipment details. Explain any mismatch.
 
-**[Live demo](https://human-exe-prototype.vercel.app)** | **[Slides](<https://docs.google.com/presentation/d/1nBu9_34_vJa1sHAVcDkhVTnMAcMzjMFUQvC6v7dG0Gs/edit?slide=id.g40a0cbd1ca3_44_0#slide=id.g40a0cbd1ca3_44_0>)** | [Documentation](docs/)
+**[Live demo](https://human-exe-prototype.vercel.app)** | **[Slides](https://docs.google.com/presentation/d/1nBu9_34_vJa1sHAVcDkhVTnMAcMzjMFUQvC6v7dG0Gs/edit?slide=id.g40a0cbd1ca3_44_0#slide=id.g40a0cbd1ca3_44_0)** | [Documentation](docs/)
 
 ![The dashboard](docs/images/dashboard.jpeg)
 
@@ -82,7 +82,7 @@ A database for reviews is the next step.
        $env:AUTO_RUN="1"; uvicorn app.api:app --port 8000
 
    Open http://localhost:8000. To see progress while the tests run, add `-v`.
-   
+
 With Docker:
 
     docker compose up --build
