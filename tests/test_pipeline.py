@@ -8,6 +8,9 @@ import tempfile
 import unittest
 from unittest import mock
 
+os.environ["SCAN_VISION"] = "off"      # unit tests must never call the real model
+os.environ["SUGGEST_AI"] = "off"
+
 from fastapi.testclient import TestClient
 
 from app import db, pipeline, readers, submission

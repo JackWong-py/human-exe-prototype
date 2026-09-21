@@ -41,8 +41,15 @@ TRUTH = {
 
 def read_values(path, data, mode, client):
     """{field: value} read from one scan. mode is 'off' (OCR only) or 'always' (model first)."""
+    previous = os.environ.get("SCAN_VISION")
     os.environ["SCAN_VISION"] = mode
-    doc = scan.read_scan(path, data, client=client if mode == "always" else None)
+    try:
+        doc = scan.read_scan(path, data, client=client if mode == "always" else None)
+    finally:                                   # put the setting back, or it leaks into every test that runs later
+        if previous is None:
+            os.environ.pop("SCAN_VISION", None)
+        else:
+            os.environ["SCAN_VISION"] = previous
     pairs = [p for p in doc.pairs if mode == "off" or p[2] == "vision model"]
     got = extract_fields(type(doc)(path=path, doc_type=doc.doc_type, pairs=pairs))
     return {f: first_line(got[f]["value"]) if f in got else "" for f in FIELDS}
