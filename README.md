@@ -74,7 +74,8 @@ A database for reviews is the next step.
 
        git clone <repository address>
        cd <repository folder>
-       python -m venv .venv
+       py -3.12 -m venv .venv
+       Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
        .venv\Scripts\Activate.ps1
        pip install -r requirements.txt
        python scripts/check_data.py            # must print OK
@@ -83,19 +84,67 @@ A database for reviews is the next step.
 
    Open http://localhost:8000. To see progress while the tests run, add `-v`.
 
-With Docker:
+---
 
-    docker compose up --build
-    open http://localhost:8000
+### On Linux (Ubuntu / Debian)
 
-Without Docker (Python 3.12 and Tesseract needed):
+1. Install the required software:
 
-    python3 -m venv .venv && source .venv/bin/activate
-    pip install -r requirements.txt
-    AUTO_RUN=1 uvicorn app.api:app --port 8000
+   ```bash
+   sudo apt update
+   sudo apt install -y git python3 python3-venv python3-pip tesseract-ocr
+   ```
 
-Pages: `/` (dashboard), `/report`, `/reviews-ui`, `/docs` (the API). Optional settings go in a `.env` file: `GEMINI_API_KEY`, `GEMINI_MODEL`.
-Tests: `python3 -m unittest discover -s tests`. Do all the parts fit together: `python3 scripts/check_contracts.py`.
+   Check the versions:
+
+   ```bash
+   python3 --version
+   tesseract --version
+   ```
+
+   Python 3.12 or newer is recommended.
+
+2. Clone the repository and create the virtual environment:
+
+   ```bash
+   git clone <repository address>
+   cd <repository folder>
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. Run the checks and tests:
+
+   ```bash
+   python3 scripts/check_data.py
+   python3 -m unittest discover -s tests
+   ```
+
+   `check_data.py` should print `OK`, and the tests should end with `OK`.
+
+4. Start the application:
+
+   ```bash
+   AUTO_RUN=1 uvicorn app.api:app --port 8000
+   ```
+
+   Open [http://localhost:8000](http://localhost:8000).
+
+   `AUTO_RUN=1` loads the email data when the application starts. Stop the server with `Ctrl+C`.
+
+---
+
+
+### With Docker
+
+Make sure Docker Desktop is installed and running.
+
+      docker compose up --build
+
+The first build may take a few minutes.
+
+Then open: http://localhost:8000
 
 ## Repository map
 
@@ -155,7 +204,7 @@ Breann: Classifier and scoring, frontend.
 
 Shyen: Readers for txt, xlsx, docx. Hand check.
 
-Yinnie: PDF and scan readers, AI scan test.
+Yinnie: PDF and scan readers, AI scan test and README validation.
 
 Sean: Comparison, hand check, and deployment.
 
