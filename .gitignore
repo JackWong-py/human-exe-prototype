@@ -35,3 +35,5 @@ backup-app-*/
 # Scoring runs: keep the log, drop the per-run submission folders
 scores/*/
 !scores/log.csv
+.vercel
+.env*

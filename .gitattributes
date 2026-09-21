@@ -1,0 +1,9 @@
+# Data files must never be changed by line-ending conversion.
+# On Windows, Git can add carriage returns to files it thinks are text, which breaks some PDFs.
+data/** -text
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
