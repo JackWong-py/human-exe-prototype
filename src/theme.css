@@ -1,0 +1,41 @@
+/*
+  Our colours, taken from the design picture (orange gradient dashboard on a pale green page).
+  shadcn reads its colours from the "--something" variables below, so changing a value here
+  changes every shadcn component at once. Try changing --primary and watch the page.
+*/
+:root {
+  --radius: 1rem;                  /* how round the cards are */
+  --background: #f1f6f2;           /* pale green page inside the window */
+  --foreground: #3f4350;           /* main text */
+  --card: #ffffff;
+  --card-foreground: #3f4350;
+  --popover: #ffffff;
+  --popover-foreground: #3f4350;
+  --primary: #f26b21;              /* the orange */
+  --primary-foreground: #ffffff;
+  --secondary: #fff1e6;            /* very light orange, used for icon circles and chips */
+  --secondary-foreground: #c2500f;
+  --muted: #eef2ef;
+  --muted-foreground: #8a919a;     /* grey small text */
+  --accent: #fff1e6;
+  --accent-foreground: #c2500f;
+  --destructive: #d64545;
+  --border: #e4eae6;
+  --input: #dfe6e1;
+  --ring: #f58a45;
+}
+
+body {
+  font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  background: #e8eee9;             /* the page outside the window */
+}
+
+/* The yellow-to-orange gradient used by the header band and the bottom banner */
+.bg-brand-gradient {
+  background-image: linear-gradient(100deg, #f9b233 0%, #f58a2b 45%, #f26b21 100%);
+}
+
+/* The soft orange shadow under the white cards */
+.shadow-soft {
+  box-shadow: 0 14px 34px -16px rgba(242, 107, 33, 0.35), 0 2px 6px rgba(63, 67, 80, 0.06);
+}
