@@ -13,6 +13,6 @@ docs
 d-kit
 doc_compare
 fixtures
-src
-public
+verification
+submission
 *.md

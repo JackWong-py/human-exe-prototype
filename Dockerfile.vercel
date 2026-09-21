@@ -1,0 +1,25 @@
+# Vercel builds THIS file and runs it as a serverless container. (Backend only: the report pages that
+# the Python app draws itself. Use Dockerfile.vercel.with-frontend once the React app (Task 6) is merged.)
+FROM python:3.12-slim
+
+# Tesseract reads the scanned PDFs.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends tesseract-ocr \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /srv
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Only what the running app needs. Secrets (.env) are NOT copied: they go into Vercel's settings.
+COPY app ./app
+COPY contracts.py loader.py ./
+COPY data ./data
+
+# /tmp is the only folder a serverless function may write to.
+# AUTO_RUN=1 makes the app read all 520 emails when it starts (a few seconds), so the report is never empty.
+ENV DB_PATH=/tmp/sdoc.db \
+    AUTO_RUN=1
+
+# Vercel sends traffic to port 80 unless the project setting PORT says otherwise, so we follow it.
+CMD ["sh", "-c", "python -m uvicorn app.api:app --host 0.0.0.0 --port ${PORT:-80}"]
