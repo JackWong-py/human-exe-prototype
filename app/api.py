@@ -10,7 +10,8 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 try:                                  # makes GEMINI_API_KEY etc. available to whoever needs them
@@ -40,6 +41,11 @@ app.add_middleware(
 )
 
 app.include_router(suggest_router)
+
+# The React app, built with `npm run build` into ./dist. If it is not built, the plain pages still work.
+DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dist")
+if os.path.isdir(os.path.join(DIST, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST, "assets")), name="assets")
 
 STATUS_ORDER = {"NEEDS_REVIEW": 0, "MISMATCH": 1, "OK": 2}
 
@@ -189,7 +195,18 @@ def _page(body):
 
 @app.get("/", include_in_schema=False)
 def index():
+    page = os.path.join(DIST, "index.html")
+    if os.path.exists(page):
+        return FileResponse(page)
     return report()
+
+
+@app.get("/favicon.svg", include_in_schema=False)
+def favicon():
+    icon = os.path.join(DIST, "favicon.svg")
+    if os.path.exists(icon):
+        return FileResponse(icon)
+    return JSONResponse({"error": "no icon"}, status_code=404)
 
 
 @app.get("/report", response_class=HTMLResponse)
