@@ -146,6 +146,9 @@ The first build may take a few minutes.
 
 Then open: http://localhost:8000
 
+Pages: `/` (dashboard), `/report`, `/reviews-ui`, `/docs` (the API). Optional settings go in a `.env` file: `GEMINI_API_KEY`, `GEMINI_MODEL`.
+Tests: `python3 -m unittest discover -s tests`. Do all the parts fit together: `python3 scripts/check_contracts.py`.
+
 ## Repository map
 
 | Path | What is in it |
