@@ -4,6 +4,7 @@
 """
 import json
 import os
+import shutil
 import tempfile
 import unittest
 from unittest import mock
@@ -30,19 +31,38 @@ def sample_submission():
     raise FileNotFoundError("sample_submission.json not found in data/ or the repo root")
 
 
+# Reading and comparing all 520 documents takes several seconds (much longer on Windows). The run is done ONCE
+# per test session, and every test that needs results gets a copy of the finished database.
+_TEMPLATE = {}
+HAS_OCR = shutil.which("tesseract") is not None or os.path.exists(os.environ.get("TESSERACT_CMD", ""))
+
+
+def fill_results():
+    """Point DB_PATH at a fresh copy of a database that already holds the results of run_all()."""
+    if "path" not in _TEMPLATE:
+        os.environ["DB_PATH"] = os.path.join(tempfile.mkdtemp(), "template.db")
+        _TEMPLATE["summary"] = pipeline.run_all()
+        _TEMPLATE["path"] = os.environ["DB_PATH"]
+    target = os.path.join(tempfile.mkdtemp(), "test.db")
+    shutil.copyfile(_TEMPLATE["path"], target)
+    os.environ["DB_PATH"] = target
+    return _TEMPLATE["summary"]
+
+
 class PipelineTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp()
         os.environ["DB_PATH"] = os.path.join(self.tmp, "test.db")
 
+    @unittest.skipUnless(HAS_OCR, "Tesseract is not installed: the 3 scanned emails cannot be read")
     def test_every_email_gets_a_result(self):
-        s = pipeline.run_all()
+        s = fill_results()
         self.assertEqual(s["total"], len(get_inbox().emails()))
         self.assertEqual(s["by_state"].get("FAILED", 0), 0)
         self.assertEqual(sum(s["by_category"].values()), s["total"])
 
     def test_missing_attachments_open_reviews(self):
-        pipeline.run_all()
+        fill_results()
         open_reviews = {r["email_id"]: r["reason"] for r in db.list_reviews("OPEN")}
         for eid in ("email_506", "email_507", "email_508", "email_509", "email_510"):
             self.assertEqual(open_reviews.get(eid), "missing_attachment", eid)
@@ -60,7 +80,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual((row["state"], row["error_stage"]), ("FAILED", "load_email"))
 
     def test_verdict_resolution_is_audited_and_never_overwritten(self):
-        pipeline.run_all()
+        fill_results()
         rv = next(r for r in db.list_reviews("OPEN") if r["email_id"] == "email_506")
         row = pipeline.resolve_review(rv["id"], by="tester", note="checked by phone",
                                       verdict="MISMATCH", defect_fields=["consignee"])
@@ -74,7 +94,7 @@ class PipelineTests(unittest.TestCase):
             pipeline.resolve_review(rv["id"], verdict="OK")
 
     def test_verdict_validation(self):
-        pipeline.run_all()
+        fill_results()
         rv = db.list_reviews("OPEN")[0]
         for bad in (dict(verdict="MISMATCH"), dict(verdict="MAYBE"),
                     dict(verdict="MISMATCH", defect_fields=["nope"]), dict()):
@@ -82,7 +102,7 @@ class PipelineTests(unittest.TestCase):
                 pipeline.resolve_review(rv["id"], **bad)
 
     def test_resolution_with_corrected_values_reruns_decide(self):
-        pipeline.run_all()
+        fill_results()
         rv = next(r for r in db.list_reviews("OPEN") if r["email_id"] == "email_507")  # BL missing
         with self.assertRaises(ValueError):           # no BL values -> still missing
             pipeline.resolve_review(rv["id"], si_values={"shipper": "X"})
@@ -91,7 +111,7 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("reviewer input", row["message"])
 
     def test_submission_matches_sample_shape(self):
-        pipeline.run_all()
+        fill_results()
         sample = sample_submission()
         sub = submission.build_submission(db.list_results())
         self.assertEqual(set(sub), set(sample))
@@ -120,9 +140,10 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(self.c.get("/api/reviews/1").json()["state"], "RESOLVED")
 
+    @unittest.skipUnless(HAS_OCR, "Tesseract is not installed: the 3 scanned emails cannot be read")
     def test_submit_is_guarded(self):
         self.assertEqual(self.c.post("/api/submission/submit").status_code, 409)   # nothing run yet
-        self.c.post("/api/run")
+        fill_results()
         with mock.patch.object(readers, "IS_STUB", True, create=True):             # pretend a stub is still active
             r = self.c.post("/api/submission/submit")
             self.assertEqual(r.status_code, 409)

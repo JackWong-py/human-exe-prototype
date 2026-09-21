@@ -1,5 +1,25 @@
-# Vercel builds THIS file and runs it as a serverless container. (Backend only: the report pages that
-# the Python app draws itself. Use Dockerfile.vercel.with-frontend once the React app (Task 6) is merged.)
+# Vercel builds THIS file and runs it as a serverless container.
+# It works BEFORE and AFTER the React frontend (Task 6) exists:
+#   - if the React app is in the project (src/pages/Dashboard.jsx), stage 1 builds it and the app serves it at "/"
+#   - if not, stage 1 does nothing and the Python app serves its own plain report pages.
+# So you can deploy today, and the frontend appears by itself on the next deploy after Task 6 is merged.
+# Trouble with the React build on Vercel? Use the safe version:
+#   mv Dockerfile.vercel Dockerfile.vercel.auto && mv Dockerfile.vercel.backend-only Dockerfile.vercel
+
+# ---- Stage 1: build the React app (only if it exists) into /web/dist ----
+FROM node:22-slim AS frontend
+WORKDIR /web
+COPY package*.json ./
+COPY index.html vite.config.js ./
+COPY public ./public
+COPY src ./src
+RUN if [ -f src/pages/Dashboard.jsx ]; then \
+      (npm ci || npm install) && npm run build; \
+    else \
+      echo "No React app found: skipping the frontend build" && mkdir -p dist; \
+    fi
+
+# ---- Stage 2: the Python backend, which also serves the built React app if there is one ----
 FROM python:3.12-slim
 
 # Tesseract reads the scanned PDFs.
@@ -15,6 +35,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY contracts.py loader.py ./
 COPY data ./data
+COPY --from=frontend /web/dist ./dist
 
 # /tmp is the only folder a serverless function may write to.
 # AUTO_RUN=1 makes the app read all 520 emails when it starts (a few seconds), so the report is never empty.
