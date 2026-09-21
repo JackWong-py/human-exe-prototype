@@ -1,3 +1,5 @@
+import { REPO_URL, SLIDES_URL } from "@/lib/links"
+
 // The frame around every page: the decorative circles, the orange header with the menu,
 // and the white window that holds the page.
 
@@ -43,6 +45,12 @@ export default function AppShell({ page, onNavigate, children }) {
             ))}
           </nav>
           <div className="flex items-center gap-3 text-sm font-semibold">
+            <a href={SLIDES_URL} target="_blank" rel="noopener noreferrer" className="hidden text-xs font-medium text-white/90 hover:text-white md:inline">
+              Slides &#8599;
+            </a>
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="hidden text-xs font-medium text-white/90 hover:text-white md:inline">
+              GitHub &#8599;
+            </a>
             <span className="grid size-9 place-items-center rounded-full bg-[#2b2d5c] text-xs">HR</span>
             <span className="hidden sm:inline">Human reviewer</span>
           </div>
@@ -50,6 +58,18 @@ export default function AppShell({ page, onNavigate, children }) {
         <div className="relative mx-4 mt-4 border-t border-white/40 sm:mx-10" />
 
         <main className="relative px-4 pb-8 pt-5 sm:px-10 sm:pb-10 sm:pt-6">{children}</main>
+
+        <footer className="relative flex flex-wrap items-center justify-between gap-3 border-t px-4 py-4 text-xs text-muted-foreground sm:px-10">
+          <span>human.exe: shipping document verification</span>
+          <span className="flex gap-5">
+            <a href={SLIDES_URL} target="_blank" rel="noopener noreferrer" className="font-medium hover:text-primary">
+              Slides &#8599;
+            </a>
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="font-medium hover:text-primary">
+              GitHub &#8599;
+            </a>
+          </span>
+        </footer>
       </div>
     </div>
   )
