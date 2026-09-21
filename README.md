@@ -2,7 +2,7 @@
 
 > Find the document requests. Compare the shipment details. Explain any mismatch.
 
-**[Live demo](<LIVE URL>)** | **[Slides](<https://docs.google.com/presentation/d/1nBu9_34_vJa1sHAVcDkhVTnMAcMzjMFUQvC6v7dG0Gs/edit?slide=id.g40a0cbd1ca3_44_0#slide=id.g40a0cbd1ca3_44_0>)** | [Documentation](docs/)
+**[Live demo](https://human-exe-prototype.vercel.app)** | **[Slides](<https://docs.google.com/presentation/d/1nBu9_34_vJa1sHAVcDkhVTnMAcMzjMFUQvC6v7dG0Gs/edit?slide=id.g40a0cbd1ca3_44_0#slide=id.g40a0cbd1ca3_44_0>)** | [Documentation](docs/)
 
 ![The dashboard](docs/images/dashboard.jpeg)
 
@@ -65,6 +65,24 @@ A database for reviews is the next step.
 
 ## Run it yourself
 
+### On Windows (PowerShell)
+
+1. Install **Python 3.12** (python.org; tick "Add python.exe to PATH") and **Tesseract** (search "Tesseract Windows installer").
+   Add the Tesseract folder (usually `C:\Program Files\Tesseract-OCR`) to your Windows `Path`, then open a **new** PowerShell window.
+   Without Tesseract everything works except reading the 3 scanned emails, and the tests skip the two that need it.
+2. Then:
+
+       git clone <repository address>
+       cd <repository folder>
+       python -m venv .venv
+       .venv\Scripts\Activate.ps1
+       pip install -r requirements.txt
+       python scripts/check_data.py            # must print OK
+       python -m unittest discover -s tests    # about a minute, ends with OK
+       $env:AUTO_RUN="1"; uvicorn app.api:app --port 8000
+
+   Open http://localhost:8000. To see progress while the tests run, add `-v`.
+   
 With Docker:
 
     docker compose up --build
