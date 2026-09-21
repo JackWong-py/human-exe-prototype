@@ -3,6 +3,7 @@
 
 const TABS = [
   ["dashboard", "Dashboard"],
+  ["emails", "Emails"],
   ["checks", "Document checks"],
   ["reviews", "Review queue"],
   ["draft", "Draft reply"],

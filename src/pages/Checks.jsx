@@ -18,7 +18,7 @@ const FILTERS = [
   ["NEEDS_REVIEW", "Needs review"],
 ]
 
-export function ChecksView({ checks, error, filter, onFilter, query, onQuery, onReview, onDraft }) {
+export function ChecksView({ checks, error, filter, onFilter, query, onQuery, onReview, onMismatch, onDraft }) {
   if (error) {
     return (
       <Alert variant="destructive" className="bg-white">
@@ -79,6 +79,9 @@ export function ChecksView({ checks, error, filter, onFilter, query, onQuery, on
                   </TableCell>
                   <TableCell className="max-w-md whitespace-normal text-xs text-muted-foreground">{describe(row)}</TableCell>
                   <TableCell className="space-x-2 whitespace-nowrap text-right">
+                    {row.status === "MISMATCH" && (
+                      <Button size="sm" onClick={() => onMismatch(row.email_id)}>Review</Button>
+                    )}
                     {row.status === "NEEDS_REVIEW" && !row.resolved_by_human && (
                       <Button size="sm" onClick={() => onReview(row.email_id)}>Review</Button>
                     )}
@@ -105,7 +108,7 @@ export function ChecksView({ checks, error, filter, onFilter, query, onQuery, on
   )
 }
 
-export default function Checks({ onReview, onDraft }) {
+export default function Checks({ onReview, onMismatch, onDraft }) {
   const checks = useApi(() => api.results({ category: "BL_COMPARISON" }))
   const [filter, setFilter] = useState("ALL")
   const [query, setQuery] = useState("")
@@ -119,6 +122,7 @@ export default function Checks({ onReview, onDraft }) {
       query={query}
       onQuery={setQuery}
       onReview={onReview}
+      onMismatch={onMismatch}
       onDraft={onDraft}
     />
   )

@@ -56,3 +56,52 @@ export function defectsByField(rows) {
     count: rows.filter((r) => r.status === "MISMATCH" && (r.defect_fields || []).includes(field)).length,
   }))
 }
+
+// ---------- email classification ----------
+export const CATEGORY_ORDER = ["BL_COMPARISON", "SI_REQUEST", "INVOICE_QUERY", "GENERAL", "SPAM"]
+
+export const CATEGORY_LABELS = {
+  BL_COMPARISON: "BL comparison",
+  SI_REQUEST: "SI request",
+  INVOICE_QUERY: "Invoice query",
+  GENERAL: "General",
+  SPAM: "Spam",
+}
+
+// One short line per category, shown under the bars on the dashboard
+export const CATEGORY_HINTS = {
+  BL_COMPARISON: "check a draft BL against the shipping instruction",
+  SI_REQUEST: "about a shipping instruction (SI)",
+  INVOICE_QUERY: "questions about an invoice",
+  GENERAL: "other business messages",
+  SPAM: "unwanted or irrelevant",
+}
+
+export const CATEGORY_STYLES = {
+  BL_COMPARISON: "border-orange-200 bg-orange-50 text-orange-700",
+  SI_REQUEST: "border-amber-200 bg-amber-50 text-amber-700",
+  INVOICE_QUERY: "border-sky-200 bg-sky-50 text-sky-700",
+  GENERAL: "border-slate-200 bg-slate-50 text-slate-600",
+  SPAM: "border-rose-200 bg-rose-50 text-rose-700",
+}
+
+// Bar colours on the dashboard
+export const CATEGORY_BAR = {
+  BL_COMPARISON: "#f26b21",
+  SI_REQUEST: "#f9b233",
+  INVOICE_QUERY: "#38bdf8",
+  GENERAL: "#94a3b8",
+  SPAM: "#fb7185",
+}
+
+// Which rule of the classifier decided (the raw rule name is shown next to it)
+export const RULE_LABELS = {
+  bl_compare: "asks to compare documents",
+  gen_chase_draft_bl: "asks us to send a draft BL",
+  general: "no other rule matched",
+  invoice: "mentions an invoice",
+  si_chase: "reminds to submit the SI",
+  si_find: "asks about a shipping instruction",
+  spam_body: "spam wording in the text",
+  spam_domain: "spam sender address",
+}

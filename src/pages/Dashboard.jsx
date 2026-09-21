@@ -10,11 +10,52 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import StatCard from "@/components/StatCard"
 import StatusBadge from "@/components/StatusBadge"
 import { api } from "@/lib/api"
-import { defectsByField, describe, sortForAttention } from "@/lib/format"
+import { CATEGORY_BAR, CATEGORY_HINTS, CATEGORY_LABELS, CATEGORY_ORDER, defectsByField, describe, sortForAttention } from "@/lib/format"
 import { useApi } from "@/lib/useApi"
 
+// How the emails were sorted: one bar per category. Clicking a bar opens the Emails page for that category.
+function ClassificationCard({ byCategory, total, onOpenCategory }) {
+  const biggest = Math.max(1, ...CATEGORY_ORDER.map((category) => byCategory[category] || 0))
+  return (
+    <Card className="border-transparent shadow-soft">
+      <CardContent className="px-4 sm:px-7">
+        <div className="flex items-start justify-between">
+          <div className="text-xs font-semibold tracking-widest text-muted-foreground">EMAIL CLASSIFICATION</div>
+          <button onClick={() => onOpenCategory("ALL")} className="text-xs text-muted-foreground hover:text-primary">
+            See all emails &rsaquo;
+          </button>
+        </div>
+        <div className="mt-1 text-sm text-muted-foreground">
+          {total} emails sorted into {CATEGORY_ORDER.length} categories
+        </div>
+        <div className="mt-4 space-y-3">
+          {CATEGORY_ORDER.map((category) => {
+            const count = byCategory[category] || 0
+            return (
+              <button key={category} onClick={() => onOpenCategory(category)} className="block w-full text-left">
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="font-medium text-foreground">
+                    {CATEGORY_LABELS[category]}
+                    <span className="ml-2 hidden text-xs font-normal text-muted-foreground sm:inline">{CATEGORY_HINTS[category]}</span>
+                  </span>
+                  <span className="font-semibold text-foreground">
+                    {count} <span className="text-xs font-normal text-muted-foreground">({Math.round((100 * count) / Math.max(total, 1))}%)</span>
+                  </span>
+                </div>
+                <div className="mt-1 h-2.5 w-full rounded-full bg-muted">
+                  <div className="h-2.5 rounded-full" style={{ width: `${(100 * count) / biggest}%`, backgroundColor: CATEGORY_BAR[category] }} />
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 // The screen itself. It only DRAWS what it is given, which makes it easy to read and to test.
-export function DashboardView({ summary, checks, error, running, message, onRun, onRefresh, onNavigate }) {
+export function DashboardView({ summary, checks, error, running, message, onRun, onRefresh, onNavigate, onOpenCategory }) {
   if (error) {
     return (
       <Alert variant="destructive" className="bg-white">
@@ -108,6 +149,9 @@ export function DashboardView({ summary, checks, error, running, message, onRun,
         </Card>
       </div>
 
+      {/* How the 520 emails were sorted */}
+      <ClassificationCard byCategory={summary.by_category || {}} total={summary.total} onOpenCategory={onOpenCategory} />
+
       {/* Three number cards */}
       <div className="grid gap-6 md:grid-cols-3">
         <StatCard icon={Check} value={ok} label="Checked and matching" hint="No difference in the 7 fields" />
@@ -136,7 +180,7 @@ export function DashboardView({ summary, checks, error, running, message, onRun,
 }
 
 // The page: it fetches the data, then hands it to the screen above.
-export default function Dashboard({ onNavigate }) {
+export default function Dashboard({ onNavigate, onOpenCategory }) {
   const summary = useApi(() => api.summary())
   const checks = useApi(() => api.results({ category: "BL_COMPARISON" }))
   const [running, setRunning] = useState(false)
@@ -170,6 +214,7 @@ export default function Dashboard({ onNavigate }) {
         checks.reload()
       }}
       onNavigate={onNavigate}
+      onOpenCategory={onOpenCategory}
     />
   )
 }
