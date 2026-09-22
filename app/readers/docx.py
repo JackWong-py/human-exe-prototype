@@ -1,3 +1,9 @@
+"""Word (.docx) documents -> RawDoc. Owned by B.
+
+    read_docx(path, data) -> RawDoc
+
+RawDoc is B's own copy of the shared shape; app/readers/__init__.py converts it for the pipeline.
+"""
 from dataclasses import dataclass
 from pathlib import Path
 

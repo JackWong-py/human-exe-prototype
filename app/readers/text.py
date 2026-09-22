@@ -1,7 +1,15 @@
+"""Plain text (.txt) documents -> RawDoc. Owned by B.
+
+    read_text(path, data) -> RawDoc
+
+RawDoc is B's own copy of the shared shape (doc_type, title, pairs, error, noisy); the dispatcher in
+app/readers/__init__.py converts it to the pipeline's contracts.RawDoc, so this file can be read and
+tested on its own.
+"""
 from dataclasses import dataclass
 from pathlib import Path
 
-# Store the information extracted from a document. 
+# Store the information extracted from a document.
 # This common structure allows TXT, XLSX, and DOCX readers to return document data in the same format.
 @dataclass
 class RawDoc:

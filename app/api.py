@@ -77,11 +77,13 @@ class ResolveIn(BaseModel):
 # ---- JSON API --------------------------------------------------------------
 @app.get("/api/health")
 def health():
+    """Is the app up, where do its emails come from, and is any module still a stub?"""
     return {"ok": True, "inbox_source": get_inbox().source, "stub_modules": _stubs()}
 
 
 @app.get("/api/summary")
 def summary():
+    """Totals for the dashboard: how many emails per category, per status, per state."""
     return db.summary()
 
 
@@ -93,27 +95,32 @@ def run_all(force: bool = False):
 
 @app.post("/api/run/{email_id}")
 def run_one(email_id: str, force: bool = False):
+    """Process one email again. A human-resolved result is kept unless force=true."""
     return pipeline.run_email(email_id, force=force)
 
 
 @app.post("/api/emails/{email_id}/retry")
 def retry(email_id: str):
+    """Re-run an email that FAILED (crashed) last time."""
     return pipeline.retry(email_id)
 
 
 @app.get("/api/results")
 def results(category: Optional[str] = None, status: Optional[str] = None,
             state: Optional[str] = None):
+    """Every stored result, optionally filtered by category (e.g. BL_COMPARISON), status or state."""
     return db.list_results(category, status, state)
 
 
 @app.get("/api/emails")     # same rows with an "id" alias, convenient for a React list
 def emails():
+    """The same rows as /api/results, with an extra "id" field (handy for a React list key)."""
     return [{**r, "id": r["email_id"]} for r in db.list_results()]
 
 
 @app.get("/api/results/{email_id}")
 def result(email_id: str):
+    """One email's result, plus its reviews, errors and audit trail. 404 if it was never run."""
     row = db.get_result(email_id)
     if row is None:
         raise pipeline.NotFound(f"No result for {email_id}")
@@ -123,11 +130,13 @@ def result(email_id: str):
 
 @app.get("/api/reviews")
 def reviews(state: str = Query("OPEN")):
+    """The review queue, by default the OPEN (unanswered) cases."""
     return db.list_reviews(state)
 
 
 @app.get("/api/reviews/{review_id}")
 def review(review_id: int):
+    """One review case: its reason and the SI/BL evidence. 404 if the id does not exist."""
     rv = db.get_review(review_id)
     if rv is None:
         raise pipeline.NotFound(f"Review {review_id} not found")
@@ -136,6 +145,7 @@ def review(review_id: int):
 
 @app.post("/api/reviews/{review_id}/resolve")
 def resolve(review_id: int, body: ResolveIn):
+    """A person's answer to one review: corrected values and/or a verdict. Re-runs the comparison."""
     return pipeline.resolve_review(
         review_id, by=body.by or "reviewer", note=body.note, verdict=body.verdict or None,
         defect_fields=body.defect_fields, si_values=body.si_values, bl_values=body.bl_values)
@@ -143,11 +153,13 @@ def resolve(review_id: int, body: ResolveIn):
 
 @app.get("/api/errors")
 def errors(email_id: Optional[str] = None):
+    """Every crash the pipeline recorded, optionally for one email."""
     return db.list_errors(email_id)
 
 
 @app.get("/api/submission")
 def get_submission():
+    """The organizers' submission.json, built from what has been run so far."""
     return submission.build_submission(db.list_results())
 
 

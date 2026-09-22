@@ -4,6 +4,10 @@
 
 **[Live demo](https://human-exe-prototype.vercel.app)** | **[Slides](https://docs.google.com/presentation/d/1nBu9_34_vJa1sHAVcDkhVTnMAcMzjMFUQvC6v7dG0Gs/edit?slide=id.g40a0cbd1ca3_44_0#slide=id.g40a0cbd1ca3_44_0)** | [Documentation](docs/)
 
+**Requirements to run it yourself:** Python 3.12 or newer, and Tesseract OCR (to read scanned
+documents). Node.js 20.19+ is only needed to build the React dashboard (see below); without it the
+app still runs, with a plain report page instead.
+
 ![The dashboard](docs/images/dashboard.png)
 
 ## The problem
@@ -55,7 +59,7 @@ Everything is deterministic rules. AI is used in two optional places and never d
 2. **AI-drafted replies.** For every case that needs a person, the app drafts an email to the sender. The facts come from our checks; the AI may only
    reword; every AI answer is checked (a dropped fact, a new number or a link means the safe template is used); a person sends it. In our test, 12 of 12
    AI drafts passed the check. Details: [docs/AI_DRAFTED_REPLIES.md](docs/AI_DRAFTED_REPLIES.md).
-3. **AI in development.** How we used an AI assistant to build and test this project, and what humans verified: [docs/AI_USE.md](docs/AI_USE.md).
+3. **AI in development.** How we used an AI assistant to build and test this project, and what humans verified: [docs/AI_USED.md](docs/AI_USE.md).
 
 ## Cloud
 
@@ -148,6 +152,30 @@ Then open: http://localhost:8000
 
 Pages: `/` (dashboard), `/report`, `/reviews-ui`, `/docs` (the API). Optional settings go in a `.env` file: `GEMINI_API_KEY`, `GEMINI_MODEL`.
 Tests: `python3 -m unittest discover -s tests`. Do all the parts fit together: `python3 scripts/check_contracts.py`.
+
+### Getting the submission file
+
+Nothing is committed to this repository, but the app builds a fresh `submission.json` (in the shape of
+`sample_submission.json`) once it has processed the emails. With the app running, and after it has
+read the inbox (`AUTO_RUN=1` does this automatically at start, or press **RUN NOW** on the dashboard):
+
+**Linux / macOS:**
+
+```bash
+curl http://localhost:8000/api/submission -o submission.json
+```
+
+**Windows (PowerShell):**
+
+```powershell
+curl.exe http://localhost:8000/api/submission -o submission.json
+```
+
+(`curl.exe` and not plain `curl`, because PowerShell's built-in `curl` is a different command and
+does not accept `-o`. `curl.exe` is included in Windows 10 and 11 already.)
+
+Running `scripts/score.py --submit` against the organizers' server writes the same file automatically,
+under `scores/<timestamp>/submission.json`.
 
 ## Repository map
 
