@@ -1,4 +1,0 @@
-pytest
-pypdf
-python-docx
-openpyxl

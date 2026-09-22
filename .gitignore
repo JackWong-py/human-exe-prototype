@@ -37,3 +37,6 @@ scores/*/
 !scores/log.csv
 .vercel
 .env*
+
+# A file literally named "env" (no dot) was committed by accident once; never again.
+env
